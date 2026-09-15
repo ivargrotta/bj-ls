@@ -9,49 +9,90 @@
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f7f0e4;
-    --surface:#ffffff;
-    --surface-2:#efe4d2;
-    --ink:#241a12;
-    --ink-soft:#5b4c3d;
-    --line:#e2d3ba;
-    --header-bg:rgba(255,251,244,.88);
-    --brick:#c1502e;
-    --brick-dark:#8f3a20;
-    --river:#1f7a6c;
-    --river-dark:#155a50;
-    --shadow:0 10px 30px -14px rgba(36,26,18,.28);
-    --fav-idle:#cbb9a1;
+    --ground-a:#0d1614;
+    --ground-b:#12241f;
+    --ground-c:#1c130f;
+    --brick:#ff7a52;
+    --brick-2:#ff5a3c;
+    --river:#2fe2c4;
+    --river-2:#18b8a6;
+    --amber:#ffbe5c;
+    --ink:#f6f2ea;
+    --ink-dim:#cdc4b6;
+    --ink-faint:#93897a;
+    --glass:rgba(255,255,255,.07);
+    --glass-strong:rgba(255,255,255,.14);
+    --glass-hi:rgba(255,255,255,.5);
+    --glass-border:rgba(255,255,255,.18);
+    --shadow-lg:0 28px 70px -30px rgba(0,0,0,.7);
+    --shadow-sm:0 12px 30px -18px rgba(0,0,0,.55);
+    --fav-idle:#8d8478;
   }
-  /* BJØLS holder samme faste, varme palett som app-konseptet i alle visninger —
-     bevisst valg, ikke tilpasset lys/mørk visningsmodus. */
+  /* BJØLS kjører ett bevisst visuelt univers — frostet glass over driv­ende
+     fargefelt i murstein- og elvefargene som definerer Bjølsen — uavhengig
+     av besøkendes lys/mørk-innstilling. */
 
   *{box-sizing:border-box;}
+  html,body{height:auto;}
   body{
-    background:var(--bg);
+    position:relative;
+    background:linear-gradient(165deg, var(--ground-a), var(--ground-b) 55%, var(--ground-c));
+    background-attachment:fixed;
     color:var(--ink);
     font-family:'Manrope',system-ui,-apple-system,sans-serif;
     padding-inline:20px;
     margin:0;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0; z-index:-1; opacity:.05; pointer-events:none;
+    mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
   }
   a{color:inherit;}
   .wrap{max-width:1180px; margin:0 auto;}
   :focus-visible{outline:2.5px solid var(--river); outline-offset:2px;}
 
+  /* ---------- drifting background blobs ---------- */
+  .bg-blobs{
+    position:fixed; inset:-12%; z-index:-2; overflow:hidden; pointer-events:none;
+    transition:transform .4s ease-out;
+  }
+  .blob{ position:absolute; border-radius:50%; filter:blur(90px); will-change:transform; }
+  .blob-1{
+    width:54vmax; height:54vmax; left:-14%; top:-16%; opacity:.5;
+    background:radial-gradient(circle at 32% 32%, var(--brick), transparent 70%);
+    animation:drift1 27s ease-in-out infinite alternate;
+  }
+  .blob-2{
+    width:60vmax; height:60vmax; right:-22%; top:6%; opacity:.42;
+    background:radial-gradient(circle at 60% 40%, var(--river), transparent 70%);
+    animation:drift2 33s ease-in-out infinite alternate;
+  }
+  .blob-3{
+    width:46vmax; height:46vmax; left:18%; bottom:-26%; opacity:.4;
+    background:radial-gradient(circle at 50% 50%, var(--amber), transparent 70%);
+    animation:drift3 23s ease-in-out infinite alternate;
+  }
+  @keyframes drift1{ from{transform:translate(0,0) scale(1);} to{transform:translate(6%,9%) scale(1.1);} }
+  @keyframes drift2{ from{transform:translate(0,0) scale(1.06);} to{transform:translate(-9%,-6%) scale(.95);} }
+  @keyframes drift3{ from{transform:translate(0,0) scale(1);} to{transform:translate(5%,-11%) scale(1.12);} }
+
   /* ---------- header ---------- */
   .site-header{
     position:sticky; top:0; z-index:30;
     margin-inline:-20px; padding-inline:20px;
-    background:var(--header-bg);
-    -webkit-backdrop-filter:blur(14px);
-    backdrop-filter:blur(14px);
-    border-bottom:1px solid var(--line);
-    box-shadow:0 0 0 rgba(36,26,18,0);
+    background:var(--glass-strong);
+    -webkit-backdrop-filter:blur(26px) saturate(180%);
+    backdrop-filter:blur(26px) saturate(180%);
+    border-bottom:1px solid var(--glass-border);
+    box-shadow:0 0 0 rgba(0,0,0,0);
     transition:box-shadow .3s ease, border-color .3s ease;
   }
   .site-header.scrolled{
-    box-shadow:0 10px 24px -18px rgba(36,26,18,.45);
-    border-bottom-color:transparent;
+    box-shadow:var(--shadow-sm);
+    border-bottom-color:var(--glass-border);
   }
   .site-header .wrap{
     display:flex; align-items:center; justify-content:space-between;
@@ -63,19 +104,19 @@
     background:linear-gradient(135deg, var(--brick), var(--river));
     display:flex; align-items:center; justify-content:center;
     transform:rotate(-5deg);
-    box-shadow:0 4px 10px #c1502e40;
+    box-shadow:0 4px 14px rgba(255,90,60,.35);
   }
-  .brand-icon svg{width:21px; height:21px; color:#fff;}
+  .brand-icon svg{width:21px; height:21px; color:#0d1210;}
   .brand-mark-sm{
     margin:0;
     font-family:'Big Shoulders Display',sans-serif;
     font-weight:800; font-size:22px; letter-spacing:.03em;
     color:var(--ink); transform:skewX(-6deg); display:inline-block;
   }
-  .brand-mark-sm .accent{color:var(--river-dark);}
+  .brand-mark-sm .accent{color:var(--river);}
   .header-count{
     font-family:'IBM Plex Mono',monospace;
-    font-size:12px; font-weight:500; color:var(--ink-soft);
+    font-size:12px; font-weight:500; color:var(--ink-faint);
     white-space:nowrap;
   }
 
@@ -83,36 +124,35 @@
   .hero{
     position:relative;
     padding-block:44px 30px;
-    overflow:hidden;
-  }
-  .hero::before{
-    content:"";
-    position:absolute; inset:0; z-index:0; pointer-events:none;
-    background:
-      radial-gradient(ellipse 55% 55% at 6% -10%, #c1502e26, transparent 60%),
-      radial-gradient(ellipse 50% 50% at 100% 10%, #1f7a6c22, transparent 65%),
-      radial-gradient(ellipse 45% 40% at 55% 105%, #e8a33d26, transparent 70%);
-  }
-  .hero::after{
-    content:"";
-    position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.5;
-    mix-blend-mode:overlay;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
   }
   .hero-spotlight{
-    position:absolute; inset:0; z-index:0; pointer-events:none;
-    background:radial-gradient(360px circle at var(--mx,50%) var(--my,0%), #c1502e1c, transparent 70%);
+    position:absolute; inset:0; z-index:0; pointer-events:none; border-radius:32px; overflow:hidden;
+    background:radial-gradient(360px circle at var(--mx,50%) var(--my,0%), rgba(255,122,82,.14), transparent 70%);
   }
   .hero-ribbon{
     position:absolute; top:6px; left:-5%; width:110%; height:120px;
-    z-index:0; opacity:.35; pointer-events:none;
+    z-index:0; opacity:.3; pointer-events:none;
   }
   .hero-ribbon path{ animation:drift 10s ease-in-out infinite alternate; }
   @keyframes drift{ from{transform:translateX(-18px);} to{transform:translateX(18px);} }
-  .hero-inner{position:relative; z-index:1; max-width:640px;}
+  .hero-inner{
+    position:relative; z-index:1; max-width:660px;
+    background:var(--glass);
+    border:1px solid var(--glass-border);
+    border-radius:28px;
+    padding:32px clamp(20px,4vw,40px);
+    -webkit-backdrop-filter:blur(28px) saturate(170%);
+    backdrop-filter:blur(28px) saturate(170%);
+    box-shadow:var(--shadow-lg);
+    overflow:hidden;
+  }
+  .hero-inner::before{
+    content:""; position:absolute; top:0; left:8%; right:8%; height:1px;
+    background:linear-gradient(90deg, transparent, var(--glass-hi), transparent);
+  }
   .hero-eyebrow{
     font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
-    letter-spacing:.14em; color:var(--river-dark); margin:0 0 10px;
+    letter-spacing:.14em; color:var(--river); margin:0 0 10px;
   }
   .brand-lockup-lg{display:flex; align-items:center; gap:16px; margin-bottom:10px;}
   .brand-icon-lg{
@@ -120,63 +160,72 @@
     background:linear-gradient(135deg, var(--brick), var(--river));
     display:flex; align-items:center; justify-content:center;
     transform:rotate(-5deg);
-    box-shadow:0 8px 20px #c1502e40;
+    box-shadow:0 10px 26px rgba(255,90,60,.4);
   }
-  .brand-icon-lg svg{width:39px; height:39px; color:#fff;}
+  .brand-icon-lg svg{width:39px; height:39px; color:#0d1210;}
   h1.brand-mark-lg{
     margin:0;
     font-family:'Big Shoulders Display',sans-serif;
     font-weight:800; font-size:clamp(40px,7vw,58px);
     letter-spacing:.02em; color:var(--ink); line-height:1;
     transform:skewX(-6deg); display:inline-block;
+    text-wrap:balance;
   }
-  h1.brand-mark-lg .accent{color:var(--river-dark);}
+  h1.brand-mark-lg .accent{color:var(--river);}
   .tagline{
     font-family:'IBM Plex Mono',monospace; font-size:16px; font-weight:500;
-    color:var(--ink-soft); margin:0 0 16px;
+    color:var(--ink-dim); margin:0 0 16px;
   }
   .hero-desc{
-    font-size:15.5px; line-height:1.6; color:var(--ink-soft);
+    font-size:15.5px; line-height:1.6; color:var(--ink-dim);
     margin:0 0 22px; max-width:52ch;
   }
   .search-bar{
     display:flex; align-items:center; gap:10px;
-    background:var(--surface); border:1.5px solid var(--line); border-radius:16px;
+    background:var(--glass-strong); border:1.5px solid var(--glass-border); border-radius:16px;
     padding:13px 16px; margin-bottom:16px; max-width:480px;
+    -webkit-backdrop-filter:blur(18px);
+    backdrop-filter:blur(18px);
     transition:border-color .2s ease, box-shadow .2s ease;
   }
   .search-bar:focus-within{
     border-color:var(--river);
-    box-shadow:0 0 0 4px #1f7a6c1e;
+    box-shadow:0 0 0 4px rgba(47,226,196,.18);
   }
-  .search-bar svg{flex:0 0 auto; color:var(--ink-soft);}
+  .search-bar svg{flex:0 0 auto; color:var(--ink-faint);}
   .search-bar input{
     border:none; outline:none; background:none; width:100%;
     font-family:'Manrope',sans-serif; font-size:15px; font-weight:500; color:var(--ink);
   }
-  .search-bar input::placeholder{color:#a8987f;}
+  .search-bar input::placeholder{color:var(--ink-faint);}
 
   /* ---------- chips ---------- */
   .chip-row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px;}
   .chip{
     display:flex; align-items:center; gap:6px;
     padding:9px 15px; border-radius:100px;
-    border:1.5px solid var(--chip-c, var(--line));
-    background:var(--surface); color:var(--chip-c, var(--ink-soft));
+    border:1.5px solid var(--glass-border);
+    background:var(--glass-strong); color:var(--ink-dim);
+    -webkit-backdrop-filter:blur(14px);
+    backdrop-filter:blur(14px);
     font-family:'Manrope',sans-serif; font-weight:700; font-size:13.5px;
-    cursor:pointer; transition:background .18s ease, color .18s ease, transform .18s cubic-bezier(.2,.8,.3,1.4), box-shadow .18s ease;
+    cursor:pointer; transition:background .18s ease, color .18s ease, border-color .18s ease, transform .18s cubic-bezier(.2,.8,.3,1.4), box-shadow .18s ease;
   }
   .chip svg{width:15px; height:15px; flex:0 0 auto; transition:transform .3s cubic-bezier(.34,1.5,.64,1);}
-  .chip.active{background:var(--chip-c, var(--ink)); border-color:var(--chip-c, var(--ink)); color:#fff;}
-  .chip:hover{transform:translateY(-2px); box-shadow:0 10px 18px -12px rgba(36,26,18,.4);}
+  .chip.active{
+    background:linear-gradient(135deg, var(--chip-c, var(--river)), var(--chip-c2, var(--river-2)));
+    border-color:transparent; color:var(--ground-a);
+    box-shadow:0 10px 24px -12px rgba(0,0,0,.5);
+  }
+  .chip:hover{transform:translateY(-2px); box-shadow:0 12px 22px -14px rgba(0,0,0,.5);}
   .chip:hover svg{transform:scale(1.12) rotate(-4deg);}
   .chip:active{transform:scale(.95);}
   .chip.fav-chip{margin-left:auto;}
   .chip .fav-count{
     font-family:'IBM Plex Mono',monospace; font-size:11px;
-    background:#00000014; padding:1px 6px; border-radius:100px;
+    background:rgba(0,0,0,.18); padding:1px 6px; border-radius:100px;
   }
-  .chip.fav-chip.active .fav-count{background:#ffffff2e;}
+  .chip.fav-chip.active .fav-count{background:rgba(255,255,255,.28);}
 
   /* ---------- layout ---------- */
   main{padding-block:26px 50px;}
@@ -186,22 +235,25 @@
     margin-bottom:14px;
   }
   .results-count{
-    font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-faint);
   }
   .segmented{
     position:relative; display:none;
-    grid-template-columns:1fr 1fr; background:var(--surface-2);
+    grid-template-columns:1fr 1fr; background:var(--glass);
+    border:1px solid var(--glass-border);
+    -webkit-backdrop-filter:blur(14px);
+    backdrop-filter:blur(14px);
     border-radius:13px; padding:4px; width:180px;
   }
   .seg-thumb{
     position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px);
-    background:var(--surface); border-radius:10px; box-shadow:0 2px 6px #00000018;
+    background:var(--glass-strong); border-radius:10px; box-shadow:var(--shadow-sm);
     transition:transform .3s cubic-bezier(.34,1.4,.64,1); z-index:0;
   }
   .segmented.map-active .seg-thumb{transform:translateX(100%);}
   .seg-btn{
     position:relative; z-index:1; border:none; background:none; padding:8px 0;
-    font-family:'Manrope',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft);
+    font-family:'Manrope',sans-serif; font-weight:700; font-size:13px; color:var(--ink-faint);
     cursor:pointer;
   }
   .seg-btn.active{color:var(--ink);}
@@ -209,28 +261,43 @@
   .card-list{display:flex; flex-direction:column; gap:12px;}
   .card{
     --i:0;
+    position:relative; overflow:hidden;
     display:flex; gap:16px; padding:16px;
-    background:var(--surface); border:1px solid var(--line); border-radius:18px;
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:22px;
+    -webkit-backdrop-filter:blur(22px) saturate(160%);
+    backdrop-filter:blur(22px) saturate(160%);
+    box-shadow:var(--shadow-sm);
     animation:riseIn .5s cubic-bezier(.2,.7,.2,1) both;
     animation-delay:calc(var(--i) * 45ms);
     transition:transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .28s ease;
   }
+  .card::before{
+    content:""; position:absolute; top:0; left:6%; right:6%; height:1px;
+    background:linear-gradient(90deg, transparent, var(--glass-hi), transparent);
+  }
+  .card::after{
+    content:""; position:absolute; top:0; left:-60%; width:40%; height:100%;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,.08), transparent);
+    transform:skewX(-20deg); transition:left .6s ease; pointer-events:none;
+  }
   .card:hover{
     transform:translateY(-4px);
     border-color:var(--cat-c1);
-    box-shadow:0 18px 34px -22px rgba(36,26,18,.5);
+    box-shadow:var(--shadow-lg), 0 0 0 1px var(--cat-c1) inset;
   }
+  .card:hover::after{left:130%;}
   @keyframes riseIn{ from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:translateY(0);} }
   .swatch{
     position:relative; overflow:hidden;
-    flex:0 0 auto; width:64px; height:64px; border-radius:15px;
+    flex:0 0 auto; width:64px; height:64px; border-radius:16px;
     display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(150deg, var(--cat-c1), var(--cat-c2)); color:#fff;
+    background:linear-gradient(150deg, var(--cat-c1), var(--cat-c2)); color:#101210;
+    box-shadow:0 8px 22px -8px var(--cat-c1);
     transition:transform .35s cubic-bezier(.34,1.4,.64,1);
   }
   .swatch::before{
     content:""; position:absolute; inset:0; z-index:0;
-    background:linear-gradient(135deg, #ffffff5c, transparent 55%);
+    background:linear-gradient(135deg, rgba(255,255,255,.45), transparent 55%);
   }
   .swatch svg{width:30px; height:30px; position:relative; z-index:1;}
   .card:hover .swatch{transform:scale(1.07) rotate(-3deg);}
@@ -250,54 +317,65 @@
   .fav-btn.is-fav{color:var(--brick);}
   .fav-btn.pop svg{animation:heartpop .4s ease;}
   @keyframes heartpop{ 0%{transform:scale(1);} 35%{transform:scale(1.35);} 60%{transform:scale(.92);} 100%{transform:scale(1);} }
-  .card-desc{font-size:13.5px; line-height:1.5; color:var(--ink-soft); margin:4px 0 8px;}
+  .card-desc{font-size:13.5px; line-height:1.5; color:var(--ink-dim); margin:4px 0 8px;}
   .meta-row{
     display:flex; flex-wrap:wrap; align-items:center; gap:8px;
-    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); margin-bottom:10px;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-faint); margin-bottom:10px;
   }
-  .meta-row a{color:var(--river-dark); font-weight:600; text-decoration:none;}
+  .meta-row a{color:var(--river); font-weight:600; text-decoration:none;}
   .meta-row a:hover, .meta-row a:focus-visible{text-decoration:underline;}
   .tag-row{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;}
-  .tag{font-size:10.5px; font-weight:700; padding:4px 9px; border-radius:100px; background:var(--surface-2); color:var(--ink-soft);}
+  .tag{font-size:10.5px; font-weight:700; padding:4px 9px; border-radius:100px; background:var(--glass-strong); border:1px solid var(--glass-border); color:var(--ink-dim);}
   .btn-directions{
     position:relative; overflow:hidden;
     display:inline-flex; align-items:center; gap:6px;
-    padding:9px 14px; border-radius:11px; background:var(--river-dark); color:#fff;
+    padding:9px 14px; border-radius:11px;
+    background:linear-gradient(135deg, var(--river), var(--river-2)); color:var(--ground-a);
     font-family:'Manrope',sans-serif; font-weight:700; font-size:12.5px; text-decoration:none;
     transition:transform .2s ease, box-shadow .2s ease;
   }
   .btn-directions:hover{
     transform:translateY(-2px);
-    box-shadow:0 12px 22px -12px #155a5090;
+    box-shadow:0 14px 26px -14px rgba(24,184,166,.55);
   }
   .btn-directions::after{
     content:""; position:absolute; top:0; left:-60%; width:35%; height:100%;
-    background:linear-gradient(120deg, transparent, #ffffff5c, transparent);
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,.6), transparent);
     transform:skewX(-20deg); transition:left .5s ease;
   }
   .btn-directions:hover::after{left:130%;}
   .btn-directions svg{width:14px; height:14px;}
   .empty-state{
-    padding:40px 20px; text-align:center; color:var(--ink-soft);
-    background:var(--surface); border:1px dashed var(--line); border-radius:18px; font-size:14px;
+    padding:40px 20px; text-align:center; color:var(--ink-dim);
+    background:var(--glass); border:1px dashed var(--glass-border); border-radius:22px; font-size:14px;
+    -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);
   }
 
   /* ---------- map panel ---------- */
   .map-panel{
-    background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:18px;
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:26px; padding:18px;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);
+    backdrop-filter:blur(24px) saturate(160%);
+    box-shadow:var(--shadow-sm);
   }
   .map-panel h2{
-    margin:0 0 4px; font-family:'Big Shoulders Display',sans-serif; font-weight:700; font-size:18px;
+    margin:0 0 4px; font-family:'Big Shoulders Display',sans-serif; font-weight:700; font-size:18px; color:var(--ink);
   }
-  .map-frame{width:100%; border-radius:16px; display:block; background:linear-gradient(165deg,#eef4ea,#e4ecdd);}
+  .map-frame{
+    width:100%; border-radius:18px; display:block;
+    background:
+      radial-gradient(120% 120% at 25% 0%, rgba(47,226,196,.14), transparent 60%),
+      radial-gradient(100% 100% at 100% 100%, rgba(255,122,82,.10), transparent 60%),
+      linear-gradient(165deg, var(--ground-b), var(--ground-a));
+  }
   .map-pin{cursor:pointer;}
   .map-pin circle.ring{opacity:0; transform-origin:center;}
   .map-pin:hover circle.ring, .map-pin:focus circle.ring{opacity:.35; animation:ringPulse 1.4s ease-out infinite;}
   @keyframes ringPulse{ 0%{transform:scale(.6); opacity:.5;} 100%{transform:scale(1.9); opacity:0;} }
   .map-legend{display:flex; flex-wrap:wrap; gap:7px 12px; margin-top:12px;}
-  .map-legend .item{display:flex; align-items:center; gap:5px; font-size:10.5px; font-weight:700; color:var(--ink-soft);}
+  .map-legend .item{display:flex; align-items:center; gap:5px; font-size:10.5px; font-weight:700; color:var(--ink-faint);}
   .map-legend .dot{width:7px; height:7px; border-radius:50%;}
-  .map-caption{margin:10px 2px 0; font-size:10.5px; color:var(--ink-soft); opacity:.8;}
+  .map-caption{margin:10px 2px 0; font-size:10.5px; color:var(--ink-faint); opacity:.8;}
 
   @media (min-width:900px){
     .layout{grid-template-columns:1fr 380px;}
@@ -313,22 +391,26 @@
     position:fixed; left:50%; bottom:24px; z-index:50;
     transform:translate(-50%,16px); opacity:0; pointer-events:none;
     display:flex; align-items:center; gap:8px;
-    background:var(--ink); color:var(--bg);
+    background:var(--glass-strong); color:var(--ink);
+    border:1px solid var(--glass-border);
+    -webkit-backdrop-filter:blur(22px) saturate(180%);
+    backdrop-filter:blur(22px) saturate(180%);
     font-family:'Manrope',sans-serif; font-weight:700; font-size:13.5px;
     padding:12px 18px; border-radius:100px;
-    box-shadow:0 16px 34px -14px rgba(0,0,0,.45);
+    box-shadow:var(--shadow-lg);
     transition:opacity .25s ease, transform .25s cubic-bezier(.2,.8,.2,1);
   }
   .toast.show{opacity:1; transform:translate(-50%,0);}
 
   /* ---------- footer ---------- */
-  footer{border-top:1px solid var(--line); padding-block:22px; margin-inline:-20px; padding-inline:20px;}
+  footer{border-top:1px solid var(--glass-border); padding-block:22px; margin-inline:-20px; padding-inline:20px;}
   footer .wrap{display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; justify-content:space-between;}
-  footer p{margin:0; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); opacity:.75;}
+  footer p{margin:0; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint); opacity:.85;}
 
   @media (prefers-reduced-motion:reduce){
     .card{animation:none; opacity:1; transition:none;}
     .card:hover{transform:none;}
+    .card::after, .btn-directions::after{transition:none;}
     .hero-ribbon path{animation:none;}
     .hero-spotlight{display:none;}
     .fav-btn.pop svg{animation:none;}
@@ -336,10 +418,18 @@
     .chip:hover, .fav-btn:hover, .card:hover .swatch{transform:none;}
     .map-pin:hover circle.ring, .map-pin:focus circle.ring{animation:none;}
     .seg-thumb{transition:none;}
+    .blob{animation:none !important;}
+    .bg-blobs{transform:none !important; transition:none;}
   }
 </style>
 </head>
 <body>
+
+<div class="bg-blobs" aria-hidden="true">
+  <span class="blob blob-1"></span>
+  <span class="blob blob-2"></span>
+  <span class="blob blob-3"></span>
+</div>
 
 <header class="site-header">
   <div class="wrap">
@@ -354,9 +444,10 @@
 <section class="hero" id="hero">
   <div class="hero-spotlight" aria-hidden="true"></div>
   <svg class="hero-ribbon" viewBox="0 0 800 120" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 70 Q 100 20, 200 65 T 400 60 T 600 70 T 800 50" stroke="#1f7a6c" stroke-width="3" fill="none"/>
+    <path d="M0 70 Q 100 20, 200 65 T 400 60 T 600 70 T 800 50" stroke="#2fe2c4" stroke-width="3" fill="none"/>
   </svg>
-  <div class="wrap hero-inner">
+  <div class="wrap">
+  <div class="hero-inner">
     <p class="hero-eyebrow">LOKAL GUIDE · BJØLSEN, OSLO</p>
     <div class="brand-lockup-lg">
       <span class="brand-icon-lg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 10 4l7 6"/><path d="M4.5 10v8h11v-8"/><path d="M8.5 18v-4.5h3V18"/><circle cx="13.5" cy="12.5" r="0.85" fill="currentColor" stroke="none"/><circle cx="19.5" cy="12" r="2.6"/><path d="M19.5 14.6V18"/></svg></span>
@@ -369,15 +460,16 @@
       <input type="text" placeholder="Søk kafé, tannlege, fotballbane…" id="searchInput">
     </div>
     <div class="chip-row" id="chipRow">
-      <button class="chip active" data-cat="alle" style="--chip-c:#241a12"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg>Alle</button>
-      <button class="chip" data-cat="kafe" style="--chip-c:#c98a1f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8Z"/><path d="M17 9h1.5a2.5 2.5 0 0 1 0 5H17"/></svg>Kafé</button>
-      <button class="chip" data-cat="restaurant" style="--chip-c:#c1502e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2v7a2 2 0 0 0 2 2v11M5 2v6M9 2v6M7 11v11"/><path d="M17 2c-1.4 1.5-1.4 4-1.4 6.2 0 1.4.7 2.3 1.4 2.3V22"/></svg>Restaurant</button>
-      <button class="chip" data-cat="bar" style="--chip-c:#7a3b4e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l-2 9a4 4 0 0 1-8 0L6 3Z"/><path d="M12 14v7M8 21h8"/></svg>Bar</button>
-      <button class="chip" data-cat="butikk" style="--chip-c:#1f7a6c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>Butikker</button>
-      <button class="chip" data-cat="aktivitet" style="--chip-c:#4c6b3f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.4 5.8L21 10l-5 4.2 1.5 6.3L12 17l-5.5 3.5L8 14.2 3 10l6.6-1.2L12 3Z"/></svg>Aktivitet</button>
-      <button class="chip" data-cat="tjenester" style="--chip-c:#3d5a73"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2 2.3-2.3Z"/></svg>Tjenester</button>
-      <button class="chip fav-chip" id="favChip" style="--chip-c:#c1502e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20.5s-7.6-4.6-10-9.3C.5 7.9 2.4 4.5 6 4.1c2-.2 3.7.8 6 3 2.3-2.2 4-3.2 6-3 3.6.4 5.5 3.8 4 7.1-2.4 4.7-10 9.3-10 9.3Z"/></svg>Favoritter <span class="fav-count" id="favCount">0</span></button>
+      <button class="chip active" data-cat="alle" style="--chip-c:#f6f2ea; --chip-c2:#cdc4b6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg>Alle</button>
+      <button class="chip" data-cat="kafe" style="--chip-c:#ffb648; --chip-c2:#ff8f3d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8Z"/><path d="M17 9h1.5a2.5 2.5 0 0 1 0 5H17"/></svg>Kafé</button>
+      <button class="chip" data-cat="restaurant" style="--chip-c:#ff6f59; --chip-c2:#ff4d4d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2v7a2 2 0 0 0 2 2v11M5 2v6M9 2v6M7 11v11"/><path d="M17 2c-1.4 1.5-1.4 4-1.4 6.2 0 1.4.7 2.3 1.4 2.3V22"/></svg>Restaurant</button>
+      <button class="chip" data-cat="bar" style="--chip-c:#ff6fb0; --chip-c2:#d94f92"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l-2 9a4 4 0 0 1-8 0L6 3Z"/><path d="M12 14v7M8 21h8"/></svg>Bar</button>
+      <button class="chip" data-cat="butikk" style="--chip-c:#34e0c0; --chip-c2:#17b6a5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>Butikker</button>
+      <button class="chip" data-cat="aktivitet" style="--chip-c:#8fe36b; --chip-c2:#5bc93f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.4 5.8L21 10l-5 4.2 1.5 6.3L12 17l-5.5 3.5L8 14.2 3 10l6.6-1.2L12 3Z"/></svg>Aktivitet</button>
+      <button class="chip" data-cat="tjenester" style="--chip-c:#6fa8ff; --chip-c2:#4c7fe0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2 2.3-2.3Z"/></svg>Tjenester</button>
+      <button class="chip fav-chip" id="favChip" style="--chip-c:#ff6f59; --chip-c2:#ff4d4d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20.5s-7.6-4.6-10-9.3C.5 7.9 2.4 4.5 6 4.1c2-.2 3.7.8 6 3 2.3-2.2 4-3.2 6-3 3.6.4 5.5 3.8 4 7.1-2.4 4.7-10 9.3-10 9.3Z"/></svg>Favoritter <span class="fav-count" id="favCount">0</span></button>
     </div>
+  </div>
   </div>
 </section>
 
@@ -396,21 +488,21 @@
       <aside class="map-panel" id="mapPanel">
         <h2>Bjølsen — oversikt</h2>
         <svg class="map-frame" viewBox="0 0 340 380" id="mapSvg">
-          <path d="M40 0 Q 90 60 60 120 Q 30 180 100 220 Q 170 260 150 320 Q 140 355 180 380" stroke="#8fb9ae" stroke-width="16" fill="none" stroke-linecap="round"/>
-          <path d="M40 0 Q 90 60 60 120 Q 30 180 100 220 Q 170 260 150 320 Q 140 355 180 380" stroke="#1f7a6c" stroke-width="3" stroke-dasharray="1 9" stroke-linecap="round" fill="none"/>
-          <rect x="200" y="30" width="70" height="46" rx="6" fill="#e7d2b4"/>
-          <rect x="230" y="130" width="80" height="50" rx="6" fill="#e2c9a6"/>
-          <rect x="20" y="260" width="66" height="44" rx="6" fill="#e7d2b4"/>
-          <rect x="210" y="270" width="90" height="56" rx="6" fill="#ddc499"/>
-          <rect x="60" y="330" width="60" height="34" rx="6" fill="#c9dfc0"/>
+          <path d="M40 0 Q 90 60 60 120 Q 30 180 100 220 Q 170 260 150 320 Q 140 355 180 380" stroke="rgba(255,255,255,.10)" stroke-width="16" fill="none" stroke-linecap="round"/>
+          <path d="M40 0 Q 90 60 60 120 Q 30 180 100 220 Q 170 260 150 320 Q 140 355 180 380" stroke="#2fe2c4" stroke-opacity=".6" stroke-width="3" stroke-dasharray="1 9" stroke-linecap="round" fill="none"/>
+          <rect x="200" y="30" width="70" height="46" rx="6" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)"/>
+          <rect x="230" y="130" width="80" height="50" rx="6" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)"/>
+          <rect x="20" y="260" width="66" height="44" rx="6" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)"/>
+          <rect x="210" y="270" width="90" height="56" rx="6" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)"/>
+          <rect x="60" y="330" width="60" height="34" rx="6" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)"/>
         </svg>
         <div class="map-legend">
-          <div class="item"><span class="dot" style="background:#c98a1f"></span>Kafé</div>
-          <div class="item"><span class="dot" style="background:#c1502e"></span>Restaurant</div>
-          <div class="item"><span class="dot" style="background:#7a3b4e"></span>Bar</div>
-          <div class="item"><span class="dot" style="background:#1f7a6c"></span>Butikk</div>
-          <div class="item"><span class="dot" style="background:#4c6b3f"></span>Aktivitet</div>
-          <div class="item"><span class="dot" style="background:#3d5a73"></span>Tjenester</div>
+          <div class="item"><span class="dot" style="background:#ffb648"></span>Kafé</div>
+          <div class="item"><span class="dot" style="background:#ff6f59"></span>Restaurant</div>
+          <div class="item"><span class="dot" style="background:#ff6fb0"></span>Bar</div>
+          <div class="item"><span class="dot" style="background:#34e0c0"></span>Butikk</div>
+          <div class="item"><span class="dot" style="background:#8fe36b"></span>Aktivitet</div>
+          <div class="item"><span class="dot" style="background:#6fa8ff"></span>Tjenester</div>
         </div>
         <p class="map-caption">Skjematisk oversikt — trykk et punkt for veibeskrivelse i Google Maps.</p>
       </aside>
@@ -432,12 +524,12 @@
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var CATS = {
-    kafe:       { label:'Kafé',       c1:'#e8a33d', c2:'#c98a1f' },
-    restaurant: { label:'Restaurant', c1:'#d4653f', c2:'#c1502e' },
-    bar:        { label:'Bar',        c1:'#93576a', c2:'#7a3b4e' },
-    butikk:     { label:'Butikk',     c1:'#2c9384', c2:'#1f7a6c' },
-    aktivitet:  { label:'Aktivitet',  c1:'#5f8351', c2:'#4c6b3f' },
-    tjenester:  { label:'Tjenester',  c1:'#5b87a6', c2:'#3d5a73' }
+    kafe:       { label:'Kafé',       c1:'#ffb648', c2:'#ff8f3d' },
+    restaurant: { label:'Restaurant', c1:'#ff6f59', c2:'#ff4d4d' },
+    bar:        { label:'Bar',        c1:'#ff6fb0', c2:'#d94f92' },
+    butikk:     { label:'Butikk',     c1:'#34e0c0', c2:'#17b6a5' },
+    aktivitet:  { label:'Aktivitet',  c1:'#8fe36b', c2:'#5bc93f' },
+    tjenester:  { label:'Tjenester',  c1:'#6fa8ff', c2:'#4c7fe0' }
   };
 
   var ICONS = {
@@ -684,7 +776,7 @@
     g.setAttribute('aria-label','Veibeskrivelse til ' + p.name);
     g.innerHTML =
       '<circle class="ring" cx="'+pos.x+'" cy="'+pos.y+'" r="10" fill="'+c.c1+'"></circle>'+
-      '<circle cx="'+pos.x+'" cy="'+pos.y+'" r="9" fill="#fff"></circle>'+
+      '<circle cx="'+pos.x+'" cy="'+pos.y+'" r="9" fill="#0d1614"></circle>'+
       '<circle cx="'+pos.x+'" cy="'+pos.y+'" r="7" fill="'+c.c1+'"></circle>';
     var openDirections = function(){ window.open(mapsDirUrl(p), '_blank', 'noopener'); };
     g.addEventListener('click', openDirections);
@@ -700,7 +792,7 @@
     siteHeader.classList.toggle('scrolled', window.scrollY > 8);
   }, { passive:true });
 
-  // ---- hero cursor spotlight ----
+  // ---- hero cursor spotlight + background blob parallax ----
   if(!reduceMotion){
     var hero = document.getElementById('hero');
     hero.addEventListener('mousemove', function(e){
@@ -708,6 +800,13 @@
       hero.style.setProperty('--mx', (e.clientX - r.left) + 'px');
       hero.style.setProperty('--my', (e.clientY - r.top) + 'px');
     });
+
+    var blobsEl = document.querySelector('.bg-blobs');
+    window.addEventListener('mousemove', function(e){
+      var px = (e.clientX / window.innerWidth - 0.5) * 26;
+      var py = (e.clientY / window.innerHeight - 0.5) * 26;
+      blobsEl.style.transform = 'translate(' + px + 'px,' + py + 'px)';
+    }, { passive:true });
   }
 })();
 </script>
